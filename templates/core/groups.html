@@ -1,0 +1,175 @@
+{% extends 'core/base.html' %}
+{% block title %}Groups – Link Up{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-4">
+  <!-- Header Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+        <div class="mb-3 mb-md-0">
+          <h1 class="mb-2">
+            <i class="bi bi-people-fill text-primary me-2"></i>Groups
+          </h1>
+          <p class="text-muted mb-0">Connect with communities that share your interests</p>
+        </div>
+        <div>
+          <a href="{% url 'create_group' %}" class="btn btn-primary rounded-pill px-4">
+            <i class="bi bi-plus-circle me-2"></i>Create Group
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Groups Section -->
+  <div class="mb-5">
+    <div class="d-flex align-items-center mb-4">
+      <h3 class="mb-0 fw-bold">
+        <i class="bi bi-star-fill text-warning me-2"></i>My Groups
+      </h3>
+      <span class="badge bg-primary rounded-pill ms-3">{{ my_groups|length }}</span>
+    </div>
+
+    {% if my_groups %}
+      <div class="row g-4">
+        {% for group in my_groups %}
+          <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+            <div class="card border-0 shadow-sm hover-shadow h-100">
+              <!-- Group Image -->
+              <div class="position-relative">
+                {% if group.image %}
+                  <img src="{{ group.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ group.name }}">
+                {% else %}
+                  <div class="bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <i class="bi bi-people-fill text-primary" style="font-size: 4rem;"></i>
+                  </div>
+                {% endif %}
+                <div class="position-absolute top-0 end-0 m-3">
+                  <span class="badge bg-success rounded-pill">
+                    <i class="bi bi-check-circle me-1"></i>Member
+                  </span>
+                </div>
+              </div>
+
+              <!-- Group Info -->
+              <div class="card-body">
+                <h5 class="card-title fw-bold mb-3">{{ group.name }}</h5>
+                
+                <div class="d-flex align-items-center text-muted mb-3">
+                  <i class="bi bi-people me-2"></i>
+                  <small>{{ group.members.count }} member{{ group.members.count|pluralize }}</small>
+                  <i class="bi bi-chat-dots ms-3 me-2"></i>
+                  <small>Active</small>
+                </div>
+
+                <div class="d-grid">
+                  <a href="{% url 'group_detail' group.id %}" class="btn btn-primary">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Enter Group
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="card border-0 shadow-sm">
+        <div class="card-body text-center py-5">
+          <i class="bi bi-inbox text-muted mb-3" style="font-size: 3rem;"></i>
+          <h5 class="text-muted mb-3">You haven't joined any groups yet</h5>
+          <p class="text-muted mb-4">Explore groups below or create your own community</p>
+          <a href="{% url 'create_group' %}" class="btn btn-primary rounded-pill px-4">
+            <i class="bi bi-plus-circle me-2"></i>Create Your First Group
+          </a>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Discover Groups Section -->
+  <div>
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div class="d-flex align-items-center">
+        <h3 class="mb-0 fw-bold">
+          <i class="bi bi-compass text-info me-2"></i>Discover Groups
+        </h3>
+        <span class="badge bg-info rounded-pill ms-3">{{ other_groups|length }}</span>
+      </div>
+      <div class="btn-group" role="group">
+        <button type="button" class="btn btn-sm btn-outline-secondary active">All</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary">Popular</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary">New</button>
+      </div>
+    </div>
+
+    {% if other_groups %}
+      <div class="row g-4">
+        {% for group in other_groups %}
+          <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+            <div class="card border-0 shadow-sm hover-shadow h-100">
+              <!-- Group Image -->
+              <div class="position-relative">
+                {% if group.image %}
+                  <img src="{{ group.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ group.name }}">
+                {% else %}
+                  <div class="bg-gradient-{{ forloop.counter|divisibleby:3|yesno:"primary,success,info" }} bg-opacity-10 d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <i class="bi bi-people-fill text-{{ forloop.counter|divisibleby:3|yesno:"primary,success,info" }}" style="font-size: 4rem;"></i>
+                  </div>
+                {% endif %}
+              </div>
+
+              <!-- Group Info -->
+              <div class="card-body">
+                <h5 class="card-title fw-bold mb-3">{{ group.name }}</h5>
+                
+                <div class="d-flex align-items-center text-muted mb-3">
+                  <i class="bi bi-people me-2"></i>
+                  <small>{{ group.members.count }} member{{ group.members.count|pluralize }}</small>
+                </div>
+
+                <div class="d-grid">
+                  <form method="post" action="{% url 'join_group' group.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-primary w-100">
+                      <i class="bi bi-plus-circle me-2"></i>Join Group
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="card border-0 shadow-sm">
+        <div class="card-body text-center py-5">
+          <i class="bi bi-check-circle text-success mb-3" style="font-size: 3rem;"></i>
+          <h5 class="text-muted mb-2">You've joined all available groups!</h5>
+          <p class="text-muted">Check back later for new communities</p>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% block extra_css %}
+<style>
+  .card {
+    transition: all 0.3s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-4px);
+  }
+  
+  .card-img-top {
+    transition: transform 0.3s ease;
+  }
+  
+  .card:hover .card-img-top {
+    transform: scale(1.05);
+  }
+</style>
+{% endblock %}
+{% endblock %}

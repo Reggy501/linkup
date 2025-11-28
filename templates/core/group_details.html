@@ -1,0 +1,238 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ group.name }} – Link Up{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-4">
+  <!-- Group Header -->
+  <div class="card border-0 shadow-sm mb-4" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);">
+    <div class="card-body p-4">
+      <div class="row align-items-center">
+        <div class="col-lg-8">
+          <div class="d-flex align-items-center text-white mb-3">
+            <a href="{% url 'groups' %}" class="btn btn-sm btn-light rounded-pill me-3">
+              <i class="bi bi-arrow-left me-1"></i>Back
+            </a>
+            <div>
+              <h2 class="mb-1 fw-bold">
+                <i class="bi bi-people-fill me-2"></i>{{ group.name }}
+              </h2>
+              <p class="mb-0 opacity-75">
+                <i class="bi bi-people me-2"></i>{{ group.members.count }} member{{ group.members.count|pluralize }}
+                <span class="mx-2">·</span>
+                <i class="bi bi-chat-dots me-2"></i>Active community
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+          <button class="btn btn-light rounded-pill px-4 me-2">
+            <i class="bi bi-bell me-2"></i>Notifications
+          </button>
+          <button class="btn btn-outline-light rounded-pill px-4">
+            <i class="bi bi-gear me-2"></i>Settings
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Main Content -->
+    <div class="col-lg-8">
+      <!-- Create Post Card -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+          <div class="d-flex align-items-start mb-3">
+            <div class="bg-primary bg-opacity-10 rounded-circle me-3 d-flex align-items-center justify-content-center" style="width:48px;height:48px;">
+              <i class="bi bi-person-fill text-primary fs-5"></i>
+            </div>
+            <form method="post" action="{% url 'post_in_group' group.id %}" enctype="multipart/form-data" class="flex-grow-1">
+              {% csrf_token %}
+              <textarea name="content" class="form-control border-0 bg-light mb-3" rows="3" placeholder="Share something with the group..." style="resize: none;"></textarea>
+              
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <label for="postImage" class="btn btn-sm btn-outline-primary rounded-pill me-2">
+                    <i class="bi bi-image me-1"></i>Photo
+                  </label>
+                  <input type="file" name="image" id="postImage" class="d-none" accept="image/*">
+                </div>
+                <button type="submit" class="btn btn-primary rounded-pill px-4">
+                  <i class="bi bi-send me-2"></i>Post
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Group Posts -->
+      <div class="posts-container">
+        {% for post in posts %}
+          <div class="card border-0 shadow-sm mb-4 post-card">
+            <div class="card-body">
+              <!-- Post Header -->
+              <div class="d-flex align-items-center mb-3">
+                <div class="bg-primary bg-opacity-10 rounded-circle me-3 d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
+                  <span class="text-primary fw-bold small">{{ post.author.username|slice:":1"|upper }}</span>
+                </div>
+                <div class="flex-grow-1">
+                  <h6 class="mb-0 fw-bold">{{ post.author.username }}</h6>
+                  <small class="text-muted">
+                    <i class="bi bi-clock me-1"></i>{{ post.created_at|timesince }} ago
+                  </small>
+                </div>
+                <div class="dropdown">
+                  <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-three-dots"></i>
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#"><i class="bi bi-flag me-2"></i>Report</a></li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Post Content -->
+              <p class="mb-3" style="white-space: pre-line;">{{ post.content }}</p>
+
+              <!-- Post Image -->
+              {% if post.image %}
+                <div class="mb-3">
+                  <img src="{{ post.image.url }}" class="img-fluid rounded" style="max-height: 400px; width: 100%; object-fit: cover;">
+                </div>
+              {% endif %}
+
+              <!-- Post Actions -->
+              <div class="d-flex gap-2 border-top pt-3">
+                <button class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                  <i class="bi bi-heart me-1"></i>Like
+                </button>
+                <button class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                  <i class="bi bi-chat-dots me-1"></i>Comment
+                </button>
+                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 ms-auto">
+                  <i class="bi bi-share"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+              <i class="bi bi-chat-left-text text-muted mb-3" style="font-size: 3rem;"></i>
+              <h5 class="text-muted mb-2">No posts yet</h5>
+              <p class="text-muted">Be the first to share something with the group!</p>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <!-- Group Chat -->
+      <div class="card border-0 shadow-sm sticky-top" style="top: 100px;">
+        <div class="card-header bg-white border-bottom">
+          <h5 class="mb-0 fw-bold">
+            <i class="bi bi-chat-dots-fill text-primary me-2"></i>Group Chat
+          </h5>
+        </div>
+        
+        <!-- Messages Area -->
+        <div class="card-body p-0">
+          <div class="chat-messages p-3" style="height: 400px; overflow-y: auto; background: var(--gray-50);">
+            {% for msg in messages %}
+              <div class="chat-message mb-3">
+                <div class="d-flex align-items-start">
+                  <div class="bg-primary bg-opacity-10 rounded-circle me-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width:32px;height:32px;">
+                    <span class="text-primary fw-bold small">{{ msg.author.username|slice:":1"|upper }}</span>
+                  </div>
+                  <div class="flex-grow-1">
+                    <div class="d-flex align-items-center mb-1">
+                      <strong class="small me-2">{{ msg.author.username }}</strong>
+                      <small class="text-muted">{{ msg.created_at|timesince }} ago</small>
+                    </div>
+                    <div class="bg-white rounded-3 p-2 shadow-sm">
+                      <p class="mb-0 small">{{ msg.content }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% empty %}
+              <div class="text-center text-muted py-5">
+                <i class="bi bi-chat-left-text mb-2" style="font-size: 2rem;"></i>
+                <p class="small mb-0">No messages yet. Start the conversation!</p>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Message Input -->
+        <div class="card-footer bg-white border-top p-3">
+          <form method="post" action="{% url 'send_message' group.id %}">
+            {% csrf_token %}
+            <div class="input-group">
+              <input name="message" class="form-control border-0 bg-light" placeholder="Type a message..." required>
+              <button class="btn btn-primary rounded-end" type="submit">
+                <i class="bi bi-send-fill"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Group Info -->
+      <div class="card border-0 shadow-sm mt-4">
+        <div class="card-body">
+          <h6 class="fw-bold mb-3">
+            <i class="bi bi-info-circle text-primary me-2"></i>About
+          </h6>
+          <p class="text-muted small mb-3">This is a community group for connecting and sharing.</p>
+          
+          <div class="d-flex justify-content-between mb-2">
+            <small class="text-muted">Created</small>
+            <small class="fw-semibold">{{ group.created_at|date:"M d, Y" }}</small>
+          </div>
+          <div class="d-flex justify-content-between">
+            <small class="text-muted">Members</small>
+            <small class="fw-semibold">{{ group.members.count }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block extra_css %}
+<style>
+  .post-card {
+    transition: all 0.3s ease;
+  }
+  
+  .post-card:hover {
+    transform: translateY(-2px);
+  }
+  
+  .chat-messages {
+    scroll-behavior: smooth;
+  }
+  
+  .chat-messages::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .chat-messages::-webkit-scrollbar-track {
+    background: var(--gray-100);
+  }
+  
+  .chat-messages::-webkit-scrollbar-thumb {
+    background: var(--gray-400);
+    border-radius: 10px;
+  }
+  
+  .chat-messages::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-500);
+  }
+</style>
+{% endblock %}
+{% endblock %}

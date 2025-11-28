@@ -1,0 +1,111 @@
+{% extends 'core/base.html' %}
+{% load django_bootstrap5 %}
+
+{% block title %}Create Group – Link Up{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8 col-xl-6">
+      <!-- Header -->
+      <div class="text-center mb-4">
+        <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 rounded-circle mb-3" style="width: 80px; height: 80px;">
+          <i class="bi bi-people-fill text-primary" style="font-size: 2.5rem;"></i>
+        </div>
+        <h1 class="display-6 fw-bold mb-2">Create a New Group</h1>
+        <p class="text-muted mb-0">Build your community and connect with like-minded people</p>
+      </div>
+
+      <!-- Form Card -->
+      <div class="card border-0 shadow-lg">
+        <div class="card-body p-4 p-md-5">
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Group Name -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">
+                <i class="bi bi-tag-fill text-primary me-2"></i>Group Name
+                <span class="text-danger">*</span>
+              </label>
+              <input type="text" name="name" class="form-control form-control-lg" required maxlength="100" placeholder="e.g., Consistency Warriors, Family Hub, Study Group">
+              <small class="text-muted">Choose a descriptive name for your group</small>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">
+                <i class="bi bi-chat-left-text-fill text-primary me-2"></i>Description
+              </label>
+              <textarea name="description" rows="5" class="form-control" placeholder="What is this group about? What are the group's goals and interests?" style="resize: none;"></textarea>
+              <small class="text-muted">Help members understand what this group is for</small>
+            </div>
+
+            <!-- Group Photo -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold">
+                <i class="bi bi-image-fill text-primary me-2"></i>Group Cover Photo
+                <span class="text-muted small fw-normal">(optional)</span>
+              </label>
+              <div class="border-2 border-dashed rounded-3 p-4 text-center bg-light" style="border: 2px dashed var(--gray-300);">
+                <i class="bi bi-cloud-upload text-muted mb-2" style="font-size: 2rem;"></i>
+                <p class="text-muted mb-2">Click to upload or drag and drop</p>
+                <input type="file" name="image" class="form-control" accept="image/*" id="groupImage">
+                <small class="text-muted">PNG, JPG, GIF up to 10MB</small>
+              </div>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="alert alert-info border-0 mb-4">
+              <div class="d-flex">
+                <i class="bi bi-info-circle-fill me-3 fs-5"></i>
+                <div>
+                  <strong>Group Guidelines</strong>
+                  <p class="mb-0 small mt-1">Make sure your group follows our community standards. Groups should be respectful, inclusive, and safe for all members.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex gap-3">
+              <a href="{% url 'groups' %}" class="btn btn-outline-secondary rounded-pill px-4 flex-grow-1">
+                <i class="bi bi-arrow-left me-2"></i>Cancel
+              </a>
+              <button type="submit" class="btn btn-primary rounded-pill px-5 flex-grow-1">
+                <i class="bi bi-plus-circle me-2"></i>Create Group
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Additional Info -->
+      <div class="text-center mt-4">
+        <p class="text-muted small mb-0">
+          By creating a group, you agree to our 
+          <a href="#" class="text-decoration-none">Community Guidelines</a> and 
+          <a href="#" class="text-decoration-none">Terms of Service</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block extra_css %}
+<style>
+  #groupImage {
+    cursor: pointer;
+  }
+  
+  .form-control:focus {
+    box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.15);
+  }
+  
+  .border-dashed:hover {
+    border-color: var(--primary) !important;
+    background: rgba(37, 99, 235, 0.05) !important;
+    transition: all 0.3s ease;
+  }
+</style>
+{% endblock %}
+{% endblock %}
